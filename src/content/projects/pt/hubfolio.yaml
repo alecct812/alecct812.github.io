@@ -1,0 +1,34 @@
+slug: hubfolio
+lang: pt
+order: 2
+featured: true
+name: HubFólio
+tagline: Pipeline de machine learning para avaliar portfólios acadêmicos, da ingestão à predição por API.
+role: Desenvolvedor de machine learning e backend
+period: 07/2025 a 12/2025
+areas: [ai, backend]
+stack:
+  - Python
+  - FastAPI
+  - MinIO (S3)
+  - PostgreSQL
+  - MLflow
+  - Docker Compose
+  - ThingsBoard
+  - Scikit-learn
+  - Jupyter Notebook
+  - Swagger/OpenAPI
+repo: https://github.com/alecct812/Projetos-6---HubFolio
+situation: >-
+  Não havia critérios objetivos para avaliar portfólios acadêmicos, o que impedia um feedback estruturado e
+  mensurável para estudantes de Design e Ciência da Computação.
+task: >-
+  Projetar e implementar um pipeline completo de machine learning, da ingestão de dados à exposição de
+  predições por API, sobre uma arquitetura de microsserviços em contêineres.
+action: >-
+  Orquestrei cinco microsserviços com Docker Compose (FastAPI, MinIO, PostgreSQL, MLflow e ThingsBoard),
+  construí o ETL completo, treinei e versionei no MLflow um modelo de Regressão Linear com oito features de
+  qualidade, e desenvolvi seis endpoints REST e um simulador de streaming de dados.
+result: >-
+  Pipeline funcional de ponta a ponta, com RMSE de cerca de 5,13 no índice de qualidade, painel interativo no
+  ThingsBoard com predições em tempo real e rastreabilidade completa dos experimentos no MLflow.

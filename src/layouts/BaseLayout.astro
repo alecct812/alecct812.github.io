@@ -1,0 +1,51 @@
+---
+import '@fontsource-variable/bricolage-grotesque/standard.css';
+import '@fontsource-variable/martian-mono/standard.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import { ClientRouter } from 'astro:transitions';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import type { Lang } from '../i18n';
+import { switchLangPath } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+}
+
+const { lang, title, description } = Astro.props;
+const site = Astro.site!;
+const here = new URL(Astro.url.pathname, site).href;
+const alt = new URL(switchLangPath(Astro.url.pathname), site).href;
+const altLang = lang === 'pt' ? 'en' : 'pt';
+---
+
+<!doctype html>
+<html lang={lang === 'pt' ? 'pt-BR' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={here} />
+    <link rel="alternate" hreflang={lang} href={here} />
+    <link rel="alternate" hreflang={altLang} href={alt} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={here} />
+    <meta property="og:locale" content={lang === 'pt' ? 'pt_BR' : 'en_US'} />
+    <meta name="theme-color" content="#06101a" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <ClientRouter />
+  </head>
+  <body>
+    <Header lang={lang} />
+    <main id="conteudo">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

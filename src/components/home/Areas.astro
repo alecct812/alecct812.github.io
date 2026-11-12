@@ -1,0 +1,137 @@
+---
+import { t, type Lang } from '../../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const d = t(lang);
+const areas = ['security', 'ai', 'backend'] as const;
+---
+
+<section class="secao" id="areas">
+  <div class="wrap">
+    <h2>{d.areas.heading}</h2>
+    <p class="areas__dica apoio">{d.areas.hint}</p>
+    <ul class="areas" data-areas-root>
+      {
+        areas.map((a) => (
+          <li class="area">
+            <h3>{d.areaNames[a]}</h3>
+            <p>{d.areas[a]}</p>
+            <button type="button" class="area__filtro" data-area={a} aria-pressed="false">
+              <span class="area__marca" aria-hidden="true" />
+              {d.areas.filter(d.areaNames[a])}
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  // Sem JavaScript a lista de projetos aparece inteira; o filtro é só um destaque.
+  function init() {
+    const root = document.querySelector('[data-areas-root]');
+    if (!root) return;
+    const buttons = root.querySelectorAll<HTMLButtonElement>('button[data-area]');
+    const rows = document.querySelectorAll<HTMLElement>('[data-project-areas]');
+    let current: string | null = null;
+
+    const apply = () => {
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.area === current)));
+      rows.forEach((r) => {
+        const has = current === null || (r.dataset.projectAreas ?? '').split(' ').includes(current);
+        r.toggleAttribute('data-dim', !has);
+      });
+    };
+
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        const area = b.dataset.area ?? null;
+        current = current === area ? null : area;
+        apply();
+      }),
+    );
+  }
+
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .areas__dica {
+    margin-top: var(--space-4);
+  }
+
+  .areas {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: var(--space-6);
+    border-top: 1px solid var(--linha);
+  }
+
+  .area {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-5) var(--space-5) 0;
+  }
+
+  .area + .area {
+    padding-left: var(--space-5);
+    border-left: 1px solid var(--linha);
+  }
+
+  .area p {
+    color: var(--texto-2);
+  }
+
+  .area__filtro {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    justify-self: start;
+    min-height: 2.6rem;
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .area__marca {
+    flex: none;
+    width: 0.85rem;
+    aspect-ratio: 1;
+    border: 1.5px solid var(--texto-2);
+    border-radius: 3px;
+    transition:
+      background-color 0.15s,
+      border-color 0.15s;
+  }
+
+  .area__filtro:hover .area__marca {
+    border-color: var(--verde);
+  }
+
+  .area__filtro[aria-pressed='true'] .area__marca {
+    background: var(--verde);
+    border-color: var(--verde);
+  }
+
+  @media (max-width: 760px) {
+    .areas {
+      grid-template-columns: 1fr;
+    }
+
+    .area,
+    .area + .area {
+      padding: var(--space-5) 0;
+      border-left: 0;
+    }
+
+    .area + .area {
+      border-top: 1px solid var(--linha);
+    }
+  }
+</style>

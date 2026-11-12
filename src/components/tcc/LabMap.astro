@@ -1,0 +1,471 @@
+---
+import { HOSTS, STEPS } from '../../data/tcc';
+import { t, type Lang } from '../../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const d = t(lang).tcc.lab;
+
+// Dois desenhos do mesmo laboratório: um largo e um estreito, trocados por CSS.
+// O srv-deploy fica na fronteira, porque tem uma interface em cada sub-rede.
+const LAYOUTS = {
+  largo: {
+    w: 1000,
+    h: 540,
+    nets: { dmz: [30, 50, 430, 440], interna: [570, 50, 400, 440] },
+    hosts: {
+      atacante: [120, 270],
+      'host-web': [310, 150],
+      'host-glhf': [310, 390],
+      'srv-deploy': [515, 270],
+      'host-db': [690, 270],
+      'host-arquivo': [870, 150],
+      'srv-financeiro': [870, 390],
+    },
+  },
+  estreito: {
+    w: 400,
+    h: 690,
+    nets: { dmz: [15, 15, 370, 285], interna: [15, 395, 370, 280] },
+    hosts: {
+      atacante: [200, 75],
+      'host-web': [95, 190],
+      'host-glhf': [305, 190],
+      'srv-deploy': [200, 345],
+      'host-db': [200, 465],
+      'host-arquivo': [95, 580],
+      'srv-financeiro': [305, 580],
+    },
+  },
+} as const;
+
+const NET_ADDR = { dmz: '172.20.0.0/24', interna: '172.21.0.0/24' } as const;
+
+// Toda ligação que algum passo usa, uma vez só, como 'origem>destino'.
+const LINKS = [...new Set(STEPS.flatMap((s) => (s.from === null ? [] : s.to.map((to) => `${s.from}>${to}`))))];
+
+type HostId = keyof (typeof LAYOUTS)['largo']['hosts'];
+const stepsText = d.steps;
+---
+
+<div class="lab" data-lab>
+  {
+    (Object.keys(LAYOUTS) as (keyof typeof LAYOUTS)[]).map((name) => {
+      const L = LAYOUTS[name];
+      const at = (id: string) => L.hosts[id as HostId];
+      return (
+        <svg class={`mapa mapa--${name}`} viewBox={`0 0 ${L.w} ${L.h}`} role="img" aria-label={d.mapAria}>
+          {(['dmz', 'interna'] as const).map((net) => {
+            const [x, y, w, h] = L.nets[net];
+            return (
+              <g data-net={net} class="rede">
+                <rect x={x} y={y} width={w} height={h} rx="10" />
+                <text x={x + 16} y={y + 28} class="rede__nome">
+                  {d.nets[net]}
+                </text>
+                <text x={x + w - 16} y={y + 28} class="rede__end" text-anchor="end">
+                  {NET_ADDR[net]}
+                </text>
+              </g>
+            );
+          })}
+          {LINKS.map((key) => {
+            const [a, b] = key.split('>') as [string, string];
+            const [x1, y1] = at(a);
+            const [x2, y2] = at(b);
+            return <line data-link={key} x1={x1} y1={y1} x2={x2} y2={y2} />;
+          })}
+          {HOSTS.map((h) => {
+            const [x, y] = at(h.id);
+            return (
+              <g data-host={h.id} class={`host host--${h.role}`}>
+                <circle class="host__halo" cx={x} cy={y} r="26" />
+                <circle class="host__no" cx={x} cy={y} r="13" />
+                <text x={x} y={y + 40} text-anchor="middle" class="host__nome">
+                  {h.id}
+                </text>
+                <text x={x} y={y + 57} text-anchor="middle" class="host__papel">
+                  {d.roles[h.role]}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      );
+    })
+  }
+
+  <div class="lab__painel">
+    <div class="lab__controles" data-controls role="group" aria-label={d.controls}>
+      <button type="button" class="acao" data-prev>{d.prev}</button>
+      <button type="button" class="acao acao--principal" data-next>{d.next}</button>
+      <p class="lab__contador mono" data-counter data-template={d.stepOf(0).replace('0', '{n}')} aria-hidden="true">
+        {d.stepOf(1)}
+      </p>
+      <ol class="lab__marcas">
+        {
+          STEPS.map((s) => (
+            <li>
+              <button type="button" data-goto={s.n} aria-label={d.goTo(s.n)}>
+                {s.n}
+              </button>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <ol class="lab__passos" aria-live="polite">
+      {
+        STEPS.map((s) => (
+          <li data-step={s.n} value={s.n}>
+            <h3>{stepsText[s.key].name}</h3>
+            <p>{stepsText[s.key].note}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="lab__elos">
+      <p class="apoio">{d.elos}</p>
+      <ul>
+        {
+          [1, 2, 3, 4, 5].map((e) => (
+            <li data-elo={e}>
+              <span class="lab__elo-marca" aria-hidden="true" />
+              {d.elo(e)}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+
+  <p class="lab__nota apoio">{d.distractor}</p>
+  <p class="lab__nota lab__teclado apoio">{d.keyboard}</p>
+</div>
+
+<script>
+  import { initLabMap } from '../../lib/lab/map';
+
+  let stop: (() => void) | null = null;
+
+  document.addEventListener('astro:page-load', () => {
+    stop?.();
+    const el = document.querySelector<HTMLElement>('[data-lab]');
+    stop = el ? initLabMap(el) : null;
+  });
+
+  document.addEventListener('astro:before-swap', () => {
+    stop?.();
+    stop = null;
+  });
+</script>
+
+<style>
+  .lab {
+    margin-top: var(--space-6);
+  }
+
+  .mapa {
+    width: 100%;
+    height: auto;
+    background: var(--painel);
+    border-radius: var(--raio);
+  }
+
+  .mapa--estreito {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .mapa--largo {
+      display: none;
+    }
+
+    .mapa--estreito {
+      display: block;
+    }
+  }
+
+  /* Sub-redes */
+  .rede rect {
+    fill: color-mix(in srgb, var(--tinta) 55%, transparent);
+    stroke: var(--linha);
+    stroke-width: 1.5;
+  }
+
+  .rede text {
+    font-family: var(--font-mono);
+    font-stretch: 87.5%;
+    font-size: 13px;
+    fill: var(--texto-2);
+  }
+
+  .rede__nome {
+    font-weight: 600;
+    fill: var(--texto);
+  }
+
+  .rede,
+  .host,
+  .mapa line {
+    transition:
+      opacity 0.35s,
+      stroke 0.35s,
+      fill 0.35s;
+  }
+
+  .rede[data-state='oculta'] {
+    opacity: 0.18;
+  }
+
+  /* Ligações */
+  .mapa line {
+    stroke: var(--linha);
+    stroke-width: 2;
+  }
+
+  .mapa line[data-state='apagado'] {
+    opacity: 0.35;
+  }
+
+  .mapa line[data-state='usado'] {
+    stroke: color-mix(in srgb, var(--verde) 45%, var(--linha));
+  }
+
+  .mapa line[data-state='ativo'] {
+    stroke: var(--verde);
+    stroke-width: 2.5;
+    stroke-dasharray: 7 9;
+    animation: fluxo 0.9s linear infinite;
+  }
+
+  @keyframes fluxo {
+    to {
+      stroke-dashoffset: -16;
+    }
+  }
+
+  /* Hosts. Sem JavaScript, o mapa mostra tudo como já visitado. */
+  .host__no {
+    fill: var(--painel);
+    stroke: var(--verde);
+    stroke-width: 2.5;
+    transition:
+      fill 0.3s,
+      stroke 0.3s;
+  }
+
+  .host__halo {
+    fill: var(--verde);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .host__nome {
+    font-family: var(--font-mono);
+    font-stretch: 87.5%;
+    font-size: 13.5px;
+    font-weight: 600;
+    fill: var(--texto);
+  }
+
+  .host__papel {
+    font-size: 13px;
+    fill: var(--texto-2);
+  }
+
+  .host--distrator .host__no {
+    stroke: var(--texto-2);
+    stroke-dasharray: 4 4;
+  }
+
+  .host[data-state='apagado'] {
+    opacity: 0.3;
+  }
+
+  .host[data-state='apagado'] .host__no {
+    stroke: var(--texto-2);
+  }
+
+  .host[data-state='ativo'] .host__no {
+    fill: var(--verde);
+    stroke: var(--verde);
+  }
+
+  .host[data-state='ativo'] .host__halo {
+    opacity: 0.16;
+  }
+
+  .host--distrator[data-state='ativo'] .host__no {
+    fill: var(--texto-2);
+    stroke: var(--texto-2);
+    stroke-dasharray: none;
+  }
+
+  .host--distrator[data-state='ativo'] .host__halo {
+    fill: var(--texto-2);
+  }
+
+  /* Painel */
+  .lab__painel {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--space-5) var(--space-7);
+    margin-top: var(--space-5);
+    align-items: start;
+  }
+
+  .lab__controles {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .lab__controles [aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .lab__contador {
+    margin-left: auto;
+    color: var(--texto-2);
+    font-size: var(--step--1);
+  }
+
+  .lab__marcas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+    margin-top: var(--space-2);
+  }
+
+  .lab__marcas button {
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1.5px solid var(--linha);
+    border-radius: 50%;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--texto-2);
+    transition:
+      border-color 0.15s,
+      background-color 0.15s,
+      color 0.15s;
+  }
+
+  .lab__marcas button:hover {
+    border-color: var(--texto-2);
+  }
+
+  .lab__marcas button[data-state='feito'] {
+    border-color: color-mix(in srgb, var(--verde) 55%, var(--linha));
+    color: var(--texto);
+  }
+
+  .lab__marcas button[data-state='atual'] {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: var(--tinta);
+    font-weight: 700;
+  }
+
+  .lab__passos {
+    grid-row: span 2;
+    display: grid;
+    gap: var(--space-5);
+    min-height: 8.5rem;
+  }
+
+  .lab__passos li {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+  }
+
+  .lab__passos h3 {
+    font-size: var(--step-4);
+  }
+
+  .lab__passos p {
+    color: var(--texto-2);
+    font-size: var(--step-1);
+    line-height: 1.45;
+    max-width: 44ch;
+  }
+
+  /* Sem JavaScript a lista inteira aparece, numerada. */
+  .lab:not([data-enhanced]) .lab__passos {
+    list-style: decimal;
+    padding-left: 1.6rem;
+  }
+
+  .lab:not([data-enhanced]) .lab__controles,
+  .lab:not([data-enhanced]) .lab__teclado {
+    display: none;
+  }
+
+  .lab__elos ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin-top: var(--space-2);
+    font-size: var(--step--1);
+  }
+
+  .lab__elos li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--texto-2);
+    transition: color 0.3s;
+  }
+
+  .lab__elo-marca {
+    width: 0.8rem;
+    aspect-ratio: 1;
+    border-radius: 2px;
+    background: var(--linha);
+    transition: background-color 0.3s;
+  }
+
+  .lab__elos li[data-state='aceso'] {
+    color: var(--texto);
+  }
+
+  .lab__elos li[data-state='aceso'] .lab__elo-marca {
+    background: var(--verde);
+  }
+
+  .lab__nota {
+    margin-top: var(--space-5);
+    font-size: var(--step--1);
+  }
+
+  .lab__teclado {
+    margin-top: var(--space-2);
+  }
+
+  @media (max-width: 860px) {
+    .lab__painel {
+      grid-template-columns: 1fr;
+    }
+
+    .lab__passos {
+      grid-row: auto;
+      min-height: 10rem;
+    }
+  }
+
+  @media (hover: none) {
+    .lab__teclado {
+      display: none;
+    }
+  }
+</style>

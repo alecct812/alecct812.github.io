@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { t } from '../i18n';
+import { homePath } from '../i18n/routes';
+
+// Uma página só para os dois idiomas: o GitHub Pages serve o mesmo 404.html em qualquer caminho.
+const pt = t('pt').notFound;
+const en = t('en').notFound;
+---
+
+<BaseLayout lang="pt" title={`${pt.title} | Alec Theotônio`} description={pt.body}>
+  <div class="wrap perdido">
+    <h1>{pt.title}</h1>
+    <p>{pt.body}</p>
+    <a class="acao acao--principal" href={homePath('pt')}>{pt.cta}</a>
+    <div lang="en" class="perdido__en">
+      <p><strong>{en.title}.</strong> {en.body}</p>
+      <a class="acao" href={homePath('en')}>{en.cta}</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .perdido {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+    padding-block: var(--space-8);
+    min-height: 60svh;
+    align-content: center;
+  }
+
+  h1 {
+    font-size: var(--step-6);
+  }
+
+  .perdido__en {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--linha);
+    color: var(--texto-2);
+    width: 100%;
+  }
+</style>

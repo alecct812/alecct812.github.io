@@ -1,0 +1,23 @@
+slug: cesaride
+lang: en
+order: 4
+featured: false
+name: CesaRide
+tagline: Ride-sharing platform for the CESAR School community.
+role: Developer and project management
+period: 08/2023 to 12/2023
+areas: [backend]
+stack:
+  - ScrumBan
+  - Jira
+  - Pair Programming
+repo: https://github.com/alecct812/cesaride
+situation: >-
+  CESAR School students and staff were dealing with mobility problems and growing local traffic.
+task: >-
+  Develop a platform to encourage shared rides.
+action: >-
+  I wrote user stories and designed screens, organized the ScrumBan flow in Jira, and worked in Pair
+  Programming.
+result: >-
+  A working solution focused on sustainable mobility and collaboration between users.

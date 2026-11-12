@@ -1,0 +1,56 @@
+---
+import { CONTACTS } from '../../data/profile';
+import { t, type Lang } from '../../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const d = t(lang).contact;
+---
+
+<section class="secao" id="contato">
+  <div class="wrap">
+    <h2>{d.heading}</h2>
+    <p class="contato__lede">{d.lede}</p>
+    <a class="contato__email" href={`mailto:${CONTACTS.email}`}>{CONTACTS.email}</a>
+    <ul class="contato__links">
+      <li><a href={CONTACTS.linkedin.url}>{CONTACTS.linkedin.label}</a></li>
+      <li><a href={CONTACTS.github.url}>{CONTACTS.github.label}</a></li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .contato__lede {
+    margin-top: var(--space-4);
+    color: var(--texto-2);
+  }
+
+  .contato__email {
+    display: inline-block;
+    margin-top: var(--space-6);
+    font-weight: 800;
+    font-stretch: 75%;
+    font-size: clamp(1.5rem, 0.6rem + 4.6vw, 3.815rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    text-decoration-color: var(--verde);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 0.16em;
+    overflow-wrap: anywhere;
+  }
+
+  .contato__email:hover {
+    color: var(--verde);
+  }
+
+  .contato__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    margin-top: var(--space-6);
+    font-size: var(--step-1);
+  }
+</style>

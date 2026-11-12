@@ -1,0 +1,34 @@
+slug: tcc
+lang: en
+order: 1
+featured: true
+name: Penetration testing agent with explicit state
+tagline: 'Undergraduate thesis: the same agent, two ways of remembering the network, twenty runs in an isolated lab.'
+role: Author, undergraduate thesis
+period: '2026'
+areas: [security, ai, backend]
+stack:
+  - Python 3.13
+  - Docker Compose
+  - Anthropic API
+  - nmap
+  - SSH
+  - hydra
+  - sqlmap
+  - curl
+  - netcat
+repo: https://github.com/alecct812/tcc
+situation: >-
+  LLM-based penetration testing agents lose session context when crossing segmented networks, and existing
+  academic solutions structure the task, not the environment.
+task: >-
+  Measure whether keeping the environment state in an explicit graph, outside the model's context window,
+  changes the agent's ability to discover and reach an internal subnet.
+action: >-
+  I built the agent (decision loop, state graph, tool wrappers with dedicated parsers), the lab of seven
+  containers on two subnets, and the instrumentation that produces the measurements. I recorded the metrics
+  and the success criterion before data collection.
+result: >-
+  Across ten pairs, the graph arm reached the internal subnet in 8 of 10 runs and the conversational memory
+  arm in 3 of 10 (one-tailed Fisher's exact test, p = 0.0349). The preregistered binary criterion was not
+  met, and the thesis reports that.

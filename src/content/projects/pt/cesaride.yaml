@@ -1,0 +1,23 @@
+slug: cesaride
+lang: pt
+order: 4
+featured: false
+name: CesaRide
+tagline: Plataforma de caronas compartilhadas para a comunidade da CESAR School.
+role: Desenvolvedor e gestão do projeto
+period: 08/2023 a 12/2023
+areas: [backend]
+stack:
+  - ScrumBan
+  - Jira
+  - Pair Programming
+repo: https://github.com/alecct812/cesaride
+situation: >-
+  Estudantes e colaboradores da CESAR School enfrentavam dificuldades de mobilidade e o aumento do tráfego
+  local.
+task: >-
+  Desenvolver uma plataforma para incentivar caronas compartilhadas.
+action: >-
+  Criei histórias de usuário e telas, organizei o fluxo ScrumBan no Jira e atuei em Pair Programming.
+result: >-
+  Solução funcional voltada à mobilidade sustentável e à colaboração entre usuários.

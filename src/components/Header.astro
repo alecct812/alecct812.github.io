@@ -1,0 +1,87 @@
+---
+import LangSwitch from './LangSwitch.astro';
+import { t, type Lang } from '../i18n';
+import { homePath } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const d = t(lang);
+const home = homePath(lang);
+---
+
+<a class="pular" href="#conteudo">{d.skip}</a>
+<header class="topo">
+  <div class="wrap topo__linha">
+    <a class="topo__nome" href={home}>{d.site.name}</a>
+    <nav class="topo__nav" aria-label={d.nav.label}>
+      <a href={`${home}#projetos`}>{d.nav.projects}</a>
+      <a class="topo__extra" href={`${home}#habilidades`}>{d.nav.skills}</a>
+      <a href={`${home}#contato`}>{d.nav.contact}</a>
+    </nav>
+    <LangSwitch lang={lang} />
+  </div>
+</header>
+
+<style>
+  .topo {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--tinta) 82%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid color-mix(in srgb, var(--linha) 70%, transparent);
+  }
+
+  .topo__linha {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    min-height: 3.6rem;
+  }
+
+  .topo__nome {
+    font-weight: 800;
+    font-stretch: 75%;
+    font-size: var(--step-1);
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    white-space: nowrap;
+    margin-right: auto;
+  }
+
+  .topo__nav {
+    display: flex;
+    gap: var(--space-5);
+    font-size: var(--step--1);
+    font-weight: 500;
+  }
+
+  .topo__nav a {
+    color: var(--texto-2);
+    text-decoration: none;
+    padding-block: 0.6rem;
+  }
+
+  .topo__nav a:hover {
+    color: var(--texto);
+  }
+
+  @media (max-width: 520px) {
+    .topo__linha,
+    .topo__nav {
+      gap: var(--space-3);
+    }
+
+    .topo__nome {
+      font-size: var(--step-0);
+    }
+
+    .topo__extra {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,10 @@
+---
+import ProjectRoute from '../../../components/project/ProjectRoute.astro';
+import { SLUGS } from '../../../i18n/routes';
+
+export const getStaticPaths = () => SLUGS.map((slug) => ({ params: { slug } }));
+
+const { slug } = Astro.params;
+---
+
+<ProjectRoute lang="en" slug={slug} />

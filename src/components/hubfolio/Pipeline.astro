@@ -1,0 +1,213 @@
+---
+import { t, type Lang } from '../../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const d = t(lang).hubfolio;
+---
+
+<section class="secao">
+  <div class="wrap">
+    <h2>{d.heading}</h2>
+    <p class="intro">{d.intro}</p>
+
+    <!-- A ordem é a do dado: é uma sequência de verdade, por isso a lista é numerada. -->
+    <ol class="fluxo" aria-label={d.aria}>
+      {
+        d.stages.map((s, i) => (
+          <li class="etapa">
+            <span class="etapa__n mono" aria-hidden="true">
+              {i + 1}
+            </span>
+            <h3>{s.name}</h3>
+            <p class="etapa__servico mono">{s.service}</p>
+            <p class="etapa__nota">{s.note}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <dl class="medidas">
+      {
+        d.metrics.map((m) => (
+          <div>
+            <dt>{m.value}</dt>
+            <dd>{m.label}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style>
+  .intro {
+    margin-top: var(--space-4);
+    color: var(--texto-2);
+    font-size: var(--step-1);
+    line-height: 1.5;
+    max-width: 62ch;
+  }
+
+  .fluxo {
+    --n: 6;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    gap: var(--space-4);
+    margin-top: var(--space-7);
+    padding-top: var(--space-6);
+  }
+
+  /* O trilho por onde o dado passa, e o dado passando. */
+  .fluxo::before,
+  .fluxo::after {
+    content: '';
+    position: absolute;
+    top: 0.9rem;
+    left: 0;
+  }
+
+  .fluxo::before {
+    right: 0;
+    height: 2px;
+    background: var(--linha);
+  }
+
+  .fluxo::after {
+    width: 3.5rem;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--texto));
+    animation: dado 5.5s linear infinite;
+  }
+
+  @keyframes dado {
+    from {
+      left: 0;
+    }
+
+    to {
+      left: calc(100% - 3.5rem);
+    }
+  }
+
+  .etapa {
+    position: relative;
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+  }
+
+  .etapa__n {
+    position: absolute;
+    top: calc(-1 * var(--space-6) + 0.9rem - 0.8rem);
+    left: 0;
+    display: grid;
+    place-items: center;
+    width: 1.7rem;
+    height: 1.7rem;
+    border: 2px solid var(--texto-2);
+    border-radius: 50%;
+    background: var(--tinta);
+    color: var(--texto);
+    font-size: 0.68rem;
+    z-index: 1;
+  }
+
+  .etapa h3 {
+    font-size: var(--step-2);
+  }
+
+  .etapa__servico {
+    color: var(--texto);
+  }
+
+  .etapa__nota {
+    color: var(--texto-2);
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+
+  .medidas {
+    margin: var(--space-7) 0 0;
+    border-top: 1px solid var(--linha);
+  }
+
+  .medidas div {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+    gap: var(--space-5);
+    align-items: baseline;
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--linha);
+  }
+
+  .medidas dt {
+    font-weight: 800;
+    font-stretch: 75%;
+    font-size: var(--step-5);
+    line-height: 1;
+  }
+
+  .medidas dd {
+    color: var(--texto-2);
+  }
+
+  /* Sem largura para seis colunas, o trilho fica em pé, à esquerda. */
+  @media (max-width: 1040px) {
+    .fluxo {
+      grid-template-columns: 1fr;
+      gap: var(--space-5);
+      padding-top: 0;
+      padding-left: 3rem;
+    }
+
+    .fluxo::before {
+      top: 0;
+      bottom: 0;
+      left: 0.8rem;
+      right: auto;
+      width: 2px;
+      height: auto;
+    }
+
+    .fluxo::after {
+      left: 0.8rem;
+      width: 2px;
+      height: 3.5rem;
+      background: linear-gradient(to bottom, transparent, var(--texto));
+      animation-name: dado-em-pe;
+    }
+
+    @keyframes dado-em-pe {
+      from {
+        top: 0;
+      }
+
+      to {
+        top: calc(100% - 3.5rem);
+      }
+    }
+
+    .etapa__n {
+      top: 0.15rem;
+      left: -3rem;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .medidas div {
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fluxo::after {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,26 @@
+slug: reconto
+lang: en
+order: 3
+featured: false
+name: Reconto
+tagline: Reverse logistics platform for electronic waste, built with Brencorp.
+role: Backend developer and project organization
+period: 02/2024 to 06/2024
+areas: [backend]
+stack:
+  - Backend
+  - UML
+  - Jira
+  - Software Engineering
+repo: https://github.com/alecct812/reconto
+situation: >-
+  The company Brencorp brought the challenge of structuring a system for the correct disposal of electronic
+  waste in Recife.
+task: >-
+  Develop a solution that brings consumers, companies, and public services together for reverse logistics.
+action: >-
+  I worked on backend features, organized and maintained the Jira board, and helped build the UML class
+  diagram.
+result: >-
+  A structured system proposal, with a defined architecture aligned with the client's needs and the urban
+  context.

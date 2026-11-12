@@ -1,0 +1,38 @@
+:root {
+  /* Cores. Verde = braço A e ação principal. Âmbar = braço B, e só ele. */
+  --tinta: #06101a;
+  --painel: #0e1c28;
+  --linha: #1c3340;
+  --verde: #3dffa2;
+  --ambar: #ffb23e;
+  --texto: #eaf3ee;
+  --texto-2: #9db4c0;
+
+  --font-sans: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-mono: 'Martian Mono Variable', ui-monospace, 'Cascadia Mono', monospace;
+
+  /* Escala 1,25 sobre 17px (1rem = 17px, definido em base.css). */
+  --step--1: 0.8rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.5625rem;
+  --step-3: clamp(1.6rem, 1.2rem + 1.6vw, 1.953rem);
+  --step-4: clamp(1.9rem, 1.3rem + 2.6vw, 2.441rem);
+  --step-5: clamp(2.2rem, 1.4rem + 3.8vw, 3.052rem);
+  --step-6: clamp(2.6rem, 1.4rem + 5.6vw, 3.815rem);
+  --step-nome: clamp(3.4rem, 0.6rem + 13.2vw, 10.5rem);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2.5rem;
+  --space-7: 4rem;
+  --space-8: clamp(4.5rem, 3rem + 7vw, 8rem);
+
+  --measure: 70ch;
+  --wrap: 1200px;
+  --gutter: clamp(20px, 4vw, 48px);
+  --raio: 6px;
+}

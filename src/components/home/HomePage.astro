@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Areas from './Areas.astro';
+import Contact from './Contact.astro';
+import Education from './Education.astro';
+import Hero from './Hero.astro';
+import ProjectList from './ProjectList.astro';
+import Skills from './Skills.astro';
+import TccFeature from './TccFeature.astro';
+import { t, type Lang } from '../../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const d = t(lang);
+---
+
+<BaseLayout lang={lang} title={d.site.title} description={d.site.description}>
+  <Hero lang={lang} />
+  <TccFeature lang={lang} />
+  <Areas lang={lang} />
+  <ProjectList lang={lang} />
+  <Skills lang={lang} />
+  <Education lang={lang} />
+  <Contact lang={lang} />
+</BaseLayout>

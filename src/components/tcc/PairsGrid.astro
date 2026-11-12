@@ -1,0 +1,280 @@
+---
+import ArmDots from '../home/ArmDots.astro';
+import { FISHER_P, PAIRS } from '../../data/tcc';
+import { num, t, type Lang } from '../../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const d = t(lang);
+const r = d.tcc.results;
+const MAX_ELO = 5;
+const pct = (elo: number) => `${(elo / MAX_ELO) * 100}%`;
+---
+
+<div class="pares" data-pairs>
+  <div class="pares__grafico">
+    <div class="pares__eixo" aria-hidden="true">
+      {[5, 4, 3, 2, 1].map((e) => <span class:list={['mono', e === 4 && 'pares__eixo-alvo']}>{r.eloAxis} {e}</span>)}
+    </div>
+    <ol class="pares__colunas">
+      {
+        PAIRS.map((p) => (
+          <li>
+            <button type="button" data-pair={p.id} aria-pressed="false" aria-label={r.pairAria(p.id, p.A.elo, p.B.elo)}>
+              <span class="pares__barras" aria-hidden="true">
+                <span class="barra barra--a" style={`height:${pct(p.A.elo)}`} />
+                <span class="barra barra--b" style={`height:${pct(p.B.elo)}`} />
+              </span>
+              <span class="pares__num mono" aria-hidden="true">
+                {String(p.id).padStart(2, '0')}
+              </span>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <div class="pares__detalhe" aria-live="polite">
+    <p class="pares__dica apoio" data-pair-hint>{r.pick}</p>
+    <ul>
+      {
+        PAIRS.map((p) => (
+          <li data-pair-detail={p.id}>
+            <strong>{r.pair(p.id)}</strong>
+            <span class="detalhe detalhe--a">{r.detail('A', p.A.elo, p.A.elo4Step)}</span>
+            <span class="detalhe detalhe--b">{r.detail('B', p.B.elo, p.B.elo4Step)}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="pares__resumo">
+    <p class="apoio">{r.metric}</p>
+    <ArmDots arm="A" lang={lang} />
+    <ArmDots arm="B" lang={lang} />
+    <p class="pares__p">
+      {d.tccFeature.fisher}: <span class="mono">p = {num(lang, FISHER_P, 4)}</span>
+    </p>
+  </div>
+</div>
+
+<script>
+  // Sem JavaScript os dez detalhes aparecem em lista; com ele, só o par escolhido.
+  function init() {
+    const root = document.querySelector<HTMLElement>('[data-pairs]');
+    if (!root) return;
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-pair]')];
+    const details = [...root.querySelectorAll<HTMLElement>('[data-pair-detail]')];
+    const hint = root.querySelector<HTMLElement>('[data-pair-hint]');
+    let current: string | null = null;
+
+    const apply = () => {
+      for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.pair === current));
+      for (const el of details) el.hidden = el.dataset.pairDetail !== current;
+      if (hint) hint.hidden = current !== null;
+    };
+
+    for (const b of buttons) {
+      b.addEventListener('click', () => {
+        current = current === b.dataset.pair ? null : (b.dataset.pair ?? null);
+        apply();
+      });
+    }
+    root.dataset.enhanced = 'true';
+    apply();
+  }
+
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .pares {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--space-6) var(--space-7);
+    margin-top: var(--space-6);
+    align-items: start;
+  }
+
+  .pares__grafico {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3);
+    --altura: 13rem;
+  }
+
+  .pares__eixo {
+    display: grid;
+    grid-template-rows: repeat(5, 1fr);
+    height: var(--altura);
+    color: var(--texto-2);
+    font-size: 0.66rem;
+    white-space: nowrap;
+  }
+
+  .pares__eixo span {
+    border-top: 1px solid var(--linha);
+    padding-top: 2px;
+  }
+
+  .pares__eixo-alvo {
+    color: var(--texto);
+    font-weight: 600;
+  }
+
+  .pares__colunas {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: clamp(2px, 0.8vw, 10px);
+  }
+
+  .pares__colunas button {
+    display: grid;
+    gap: var(--space-2);
+    width: 100%;
+    padding: 0;
+    border-radius: 4px;
+  }
+
+  .pares__barras {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    align-items: end;
+    height: var(--altura);
+    /* Linhas da grade a cada elo; a do elo 4 é o limiar da hipótese. */
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--linha) 0,
+      var(--linha) 1px,
+      transparent 1px,
+      transparent 20%
+    );
+    transition: background-color 0.15s;
+  }
+
+  .barra {
+    border-radius: 2px 2px 0 0;
+    min-height: 2px;
+    opacity: 0.85;
+    transition: opacity 0.15s;
+  }
+
+  .barra--a {
+    background: var(--verde);
+  }
+
+  .barra--b {
+    background: var(--ambar);
+  }
+
+  .pares__num {
+    color: var(--texto-2);
+    font-size: 0.68rem;
+    text-align: center;
+  }
+
+  .pares__colunas button:hover .barra,
+  .pares__colunas button[aria-pressed='true'] .barra {
+    opacity: 1;
+  }
+
+  .pares__colunas button[aria-pressed='true'] .pares__barras {
+    background-color: color-mix(in srgb, var(--texto) 9%, transparent);
+  }
+
+  .pares__colunas button[aria-pressed='true'] .pares__num {
+    color: var(--texto);
+    font-weight: 700;
+  }
+
+  .pares__detalhe {
+    grid-column: 1;
+    min-height: 5.5rem;
+  }
+
+  .pares__detalhe ul {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .pares__detalhe li {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .pares__detalhe strong {
+    font-size: var(--step-2);
+    font-weight: 800;
+    font-stretch: 75%;
+  }
+
+  .detalhe {
+    padding-left: var(--space-4);
+    border-left: 3px solid var(--verde);
+  }
+
+  .detalhe--b {
+    border-left-color: var(--ambar);
+  }
+
+  .pares:not([data-enhanced]) .pares__dica {
+    display: none;
+  }
+
+  .pares__resumo {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: grid;
+    gap: var(--space-5);
+    padding: var(--space-5);
+    background: var(--painel);
+    border-radius: var(--raio);
+  }
+
+  .pares__resumo .apoio,
+  .pares__p {
+    font-size: var(--step--1);
+  }
+
+  .pares__p {
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--linha);
+    color: var(--texto-2);
+  }
+
+  .pares__p .mono {
+    color: var(--texto);
+    font-size: 1em;
+  }
+
+  @media (max-width: 860px) {
+    .pares {
+      grid-template-columns: 1fr;
+    }
+
+    .pares__resumo {
+      grid-column: 1;
+      grid-row: auto;
+    }
+  }
+
+  @media (max-width: 460px) {
+    .pares__grafico {
+      --altura: 10rem;
+    }
+
+    .pares__eixo {
+      display: none;
+    }
+
+    .pares__grafico {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

@@ -1,0 +1,88 @@
+---
+import ArmDots from './ArmDots.astro';
+import { FISHER_P } from '../../data/tcc';
+import { num, t, type Lang } from '../../i18n';
+import { projectPath } from '../../i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const d = t(lang).tccFeature;
+---
+
+<section class="secao" id="tcc">
+  <div class="wrap destaque">
+    <div class="destaque__texto">
+      <h2>{d.heading}</h2>
+      <p>{d.body}</p>
+      <a class="acao acao--principal" href={projectPath(lang, 'tcc')}>{d.cta}</a>
+    </div>
+    <div class="destaque__medida">
+      <ArmDots arm="A" lang={lang} />
+      <ArmDots arm="B" lang={lang} />
+      <p class="destaque__p">
+        {d.fisher}: <span class="mono">p = {num(lang, FISHER_P, 4)}</span>
+      </p>
+      <p class="destaque__ressalva">{d.caveat}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .destaque {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  .destaque__texto {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .destaque__texto h2 {
+    font-size: var(--step-5);
+    max-width: 20ch;
+  }
+
+  .destaque__texto p {
+    color: var(--texto-2);
+    max-width: 52ch;
+  }
+
+  .destaque__medida {
+    display: grid;
+    gap: var(--space-5);
+    padding: var(--space-5);
+    background: var(--painel);
+    border-radius: var(--raio);
+  }
+
+  .destaque__p {
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--linha);
+    font-size: var(--step--1);
+    color: var(--texto-2);
+  }
+
+  .destaque__p .mono {
+    color: var(--texto);
+    font-size: 1em;
+  }
+
+  .destaque__ressalva {
+    font-size: var(--step--1);
+    color: var(--texto-2);
+  }
+
+  @media (max-width: 860px) {
+    .destaque {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+  }
+</style>

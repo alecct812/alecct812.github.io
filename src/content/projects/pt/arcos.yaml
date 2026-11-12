@@ -1,0 +1,25 @@
+slug: arcos
+lang: pt
+order: 5
+featured: false
+name: Arcos
+tagline: Plataforma white label para organizações medirem e comunicarem impacto social.
+role: Desenvolvedor e gestão do projeto
+period: 08/2023 a 12/2023
+areas: [backend]
+stack:
+  - Requisitos
+  - Jira
+  - Pair Programming
+repo: https://github.com/alecct812/Arcos
+situation: >-
+  Organizações não governamentais têm dificuldade em mensurar e comunicar o impacto de seus projetos
+  sociais.
+task: >-
+  Desenvolver uma plataforma flexível para mensurar e apresentar o impacto social de diferentes programas.
+action: >-
+  Contribuí na definição de requisitos, nas histórias de usuário e na criação de telas, organizei o fluxo no
+  Jira e atuei em Pair Programming.
+result: >-
+  Estrutura de plataforma adaptável a múltiplos contextos sociais, com foco em transparência e atração de
+  doadores.

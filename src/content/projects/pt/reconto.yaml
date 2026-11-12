@@ -1,0 +1,26 @@
+slug: reconto
+lang: pt
+order: 3
+featured: false
+name: Reconto
+tagline: Plataforma de logística reversa de lixo eletrônico, desenvolvida com a Brencorp.
+role: Desenvolvedor backend e organização do projeto
+period: 02/2024 a 06/2024
+areas: [backend]
+stack:
+  - Backend
+  - UML
+  - Jira
+  - Engenharia de Software
+repo: https://github.com/alecct812/reconto
+situation: >-
+  A empresa Brencorp trouxe o desafio de estruturar um sistema para o descarte correto de lixo eletrônico no
+  Recife.
+task: >-
+  Desenvolver uma solução que integrasse consumidores, empresas e serviços públicos na logística reversa.
+action: >-
+  Atuei no desenvolvimento de funcionalidades de backend, na organização e manutenção do quadro no Jira e
+  na construção do diagrama de classes UML.
+result: >-
+  Proposta de sistema estruturada, com arquitetura definida e alinhada às necessidades do cliente e do
+  contexto urbano.

@@ -1,0 +1,113 @@
+---
+import { getCollection } from 'astro:content';
+import { t, type Lang } from '../../i18n';
+import { projectPath } from '../../i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const d = t(lang);
+const projects = (await getCollection('projects'))
+  .filter((e) => e.data.lang === lang)
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<section class="secao" id="projetos">
+  <div class="wrap">
+    <h2>{d.projects.heading}</h2>
+    <ul class="lista">
+      {
+        projects.map(({ data: p }) => (
+          <li class:list={['proj', p.featured && 'proj--destaque']} data-project-areas={p.areas.join(' ')}>
+            <a class="proj__link" href={projectPath(lang, p.slug)} aria-label={d.projects.open(p.name)}>
+              <div class="proj__titulo">
+                <h3 class="proj__nome" transition:name={`projeto-${p.slug}`}>
+                  {p.name}
+                </h3>
+                <p class="proj__frase">{p.tagline}</p>
+              </div>
+              <p class="proj__meta">
+                {p.role}
+                <br />
+                {p.period}
+              </p>
+              <p class="proj__areas">{p.areas.map((a) => d.areaNames[a]).join(', ')}</p>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .lista {
+    margin-top: var(--space-6);
+    border-top: 1px solid var(--linha);
+  }
+
+  .proj {
+    border-bottom: 1px solid var(--linha);
+    transition: opacity 0.25s;
+  }
+
+  .proj[data-dim] {
+    opacity: 0.28;
+  }
+
+  .proj__link {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) minmax(0, 2fr);
+    gap: var(--space-5);
+    align-items: baseline;
+    padding: var(--space-5) 0;
+    text-decoration: none;
+  }
+
+  .proj__link:hover .proj__nome,
+  .proj__link:focus-visible .proj__nome {
+    color: var(--verde);
+  }
+
+  .proj__nome {
+    font-size: var(--step-3);
+  }
+
+  .proj--destaque .proj__nome {
+    font-size: var(--step-5);
+  }
+
+  .proj--destaque .proj__link {
+    padding-block: var(--space-6);
+  }
+
+  .proj__frase {
+    margin-top: var(--space-2);
+    color: var(--texto-2);
+    max-width: 48ch;
+  }
+
+  .proj__meta,
+  .proj__areas {
+    font-size: var(--step--1);
+    color: var(--texto-2);
+  }
+
+  .proj__areas {
+    text-align: right;
+    color: var(--texto);
+  }
+
+  @media (max-width: 760px) {
+    .proj__link {
+      grid-template-columns: 1fr;
+      gap: var(--space-3);
+    }
+
+    .proj__areas {
+      text-align: left;
+    }
+  }
+</style>

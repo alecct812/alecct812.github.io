@@ -1,0 +1,237 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t, type Lang } from '../../i18n';
+import { homePath, projectPath } from '../../i18n/routes';
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+  lang: Lang;
+}
+
+const { entry, lang } = Astro.props;
+const p = entry.data;
+const d = t(lang);
+
+const all = (await getCollection('projects'))
+  .filter((e) => e.data.lang === lang)
+  .sort((a, b) => a.data.order - b.data.order);
+const index = all.findIndex((e) => e.data.slug === p.slug);
+const prev = all[index - 1]?.data;
+const next = all[index + 1]?.data;
+
+const blocks = [
+  [d.project.situation, p.situation],
+  [d.project.task, p.task],
+  [d.project.action, p.action],
+  [d.project.result, p.result],
+] as const;
+---
+
+<BaseLayout lang={lang} title={d.project.metaTitle(p.name)} description={p.tagline}>
+  <article>
+    <header class="wrap cab">
+      <a class="cab__voltar" href={`${homePath(lang)}#projetos`}>{d.project.all}</a>
+      <h1 class="cab__nome" transition:name={`projeto-${p.slug}`}>{p.name}</h1>
+      <p class="lede cab__frase">{p.tagline}</p>
+      <dl class="cab__meta">
+        <div>
+          <dt>{d.project.role}</dt>
+          <dd>{p.role}</dd>
+        </div>
+        <div>
+          <dt>{d.project.period}</dt>
+          <dd>{p.period}</dd>
+        </div>
+        {
+          p.areas.length > 0 && (
+            <div>
+              <dt>{d.project.areas}</dt>
+              <dd>{p.areas.map((a) => d.areaNames[a]).join(', ')}</dd>
+            </div>
+          )
+        }
+      </dl>
+    </header>
+
+    <section class="secao">
+      <div class="wrap">
+        <h2>{d.project.summary}</h2>
+        <dl class="star">
+          {
+            blocks.map(([label, text]) => (
+              <div class="star__linha">
+                <dt>{label}</dt>
+                <dd>{text}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </section>
+
+    <slot />
+
+    <section class="secao">
+      <div class="wrap pilha">
+        <div>
+          <h2>{d.project.stack}</h2>
+          <ul class="pilha__lista">
+            {p.stack.map((s) => <li>{s}</li>)}
+          </ul>
+        </div>
+        <div class="pilha__repo">
+          <slot name="repo" />
+          <a class="acao acao--principal" href={p.repo}>{d.project.repo}</a>
+        </div>
+      </div>
+    </section>
+
+    <nav class="secao vizinhos" aria-label={d.projects.heading}>
+      <div class="wrap vizinhos__linha">
+        {
+          prev ? (
+            <a href={projectPath(lang, prev.slug)}>
+              <span class="apoio">{d.project.prev}</span>
+              <strong>{prev.name}</strong>
+            </a>
+          ) : (
+            <span />
+          )
+        }
+        {
+          next && (
+            <a class="vizinhos__prox" href={projectPath(lang, next.slug)}>
+              <span class="apoio">{d.project.next}</span>
+              <strong>{next.name}</strong>
+            </a>
+          )
+        }
+      </div>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .cab {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+    padding-block: var(--space-7) var(--space-8);
+  }
+
+  .cab__voltar {
+    font-size: var(--step--1);
+    color: var(--texto-2);
+  }
+
+  .cab__nome {
+    font-size: clamp(2.6rem, 1rem + 7.4vw, 6.2rem);
+    line-height: 0.92;
+    letter-spacing: -0.025em;
+    max-width: 16ch;
+  }
+
+  .cab__frase {
+    color: var(--texto-2);
+    max-width: 40ch;
+  }
+
+  .cab__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-7);
+    margin-top: var(--space-4);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--linha);
+    width: 100%;
+  }
+
+  .cab__meta dt,
+  .star dt {
+    color: var(--texto-2);
+    font-size: var(--step--1);
+  }
+
+  .star {
+    margin: var(--space-6) 0 0;
+    border-top: 1px solid var(--linha);
+  }
+
+  .star__linha {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+    gap: var(--space-5);
+    padding: var(--space-5) 0;
+    border-bottom: 1px solid var(--linha);
+    align-items: baseline;
+  }
+
+  .star dd {
+    font-size: var(--step-1);
+    line-height: 1.5;
+    max-width: 60ch;
+  }
+
+  .pilha {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  .pilha__lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin-top: var(--space-5);
+    font-size: var(--step-1);
+    font-weight: 500;
+  }
+
+  .pilha__repo {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .vizinhos__linha {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-6);
+  }
+
+  .vizinhos a {
+    display: grid;
+    gap: var(--space-1);
+    text-decoration: none;
+  }
+
+  .vizinhos strong {
+    font-size: var(--step-3);
+    font-weight: 800;
+    font-stretch: 75%;
+    line-height: 1.1;
+  }
+
+  .vizinhos a:hover strong {
+    color: var(--verde);
+  }
+
+  .vizinhos__prox {
+    text-align: right;
+    margin-left: auto;
+  }
+
+  @media (max-width: 760px) {
+    .star__linha,
+    .pilha {
+      grid-template-columns: 1fr;
+      gap: var(--space-3);
+    }
+
+    .pilha {
+      gap: var(--space-6);
+    }
+  }
+</style>

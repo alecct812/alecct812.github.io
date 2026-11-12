@@ -1,0 +1,231 @@
+---
+import { t, type Lang } from '../../i18n';
+import { projectPath } from '../../i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const d = t(lang);
+
+// Posições como fração da área: x/y em telas largas, mx/my em telas estreitas.
+// O grafo fica à direita em telas largas e no alto em telas estreitas, fora do nome.
+const NODES = [
+  { id: 'atacante', x: 0.6, y: 0.18, mx: 0.13, my: 0.1, flip: true, kind: 'host' },
+  { id: 'host-web', x: 0.7, y: 0.37, mx: 0.34, my: 0.25, flip: false, kind: 'host' },
+  { id: 'host-glhf', x: 0.61, y: 0.53, mx: 0.11, my: 0.36, flip: false, kind: 'distrator' },
+  { id: 'srv-deploy', x: 0.78, y: 0.2, mx: 0.55, my: 0.11, flip: false, kind: 'pivo' },
+  { id: 'host-db', x: 0.86, y: 0.45, mx: 0.73, my: 0.27, flip: false, kind: 'host' },
+  { id: 'host-arquivo', x: 0.95, y: 0.22, mx: 0.9, my: 0.1, flip: true, kind: 'host' },
+  { id: 'srv-financeiro', x: 0.93, y: 0.67, mx: 0.86, my: 0.41, flip: true, kind: 'host' },
+] as const;
+
+const EDGES = [
+  ['atacante', 'host-web'],
+  ['atacante', 'host-glhf'],
+  ['atacante', 'srv-deploy'],
+  ['srv-deploy', 'host-db'],
+  ['host-db', 'host-arquivo'],
+  ['host-db', 'srv-financeiro'],
+] as const;
+
+const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
+const pos = (id: string) => NODES.find((n) => n.id === id)!;
+const [first, ...rest] = d.site.name.split(' ');
+---
+
+<section class="hero" data-hero>
+  <canvas class="hero__chuva" aria-hidden="true"></canvas>
+  <svg class="hero__grafo" data-graph aria-hidden="true" focusable="false">
+    {
+      EDGES.map(([a, b]) => (
+        <line
+          data-edge
+          data-a={a}
+          data-b={b}
+          x1={pct(pos(a).x)}
+          y1={pct(pos(a).y)}
+          x2={pct(pos(b).x)}
+          y2={pct(pos(b).y)}
+        />
+      ))
+    }
+    {
+      NODES.map((n) => (
+        <g data-node={n.id} data-x={n.x} data-y={n.y} data-mx={n.mx} data-my={n.my} class={`no no--${n.kind}`}>
+          <circle cx={pct(n.x)} cy={pct(n.y)} r={n.kind === 'pivo' ? 7 : 5} />
+          <text x={pct(n.x)} y={pct(n.y)} dx={n.flip ? -13 : 13} dy="4" text-anchor={n.flip ? 'end' : 'start'}>
+            {n.id}
+          </text>
+        </g>
+      ))
+    }
+  </svg>
+  <div class="hero__veu" aria-hidden="true"></div>
+
+  <div class="wrap hero__texto">
+    <h1 class="hero__nome" data-name aria-label={d.site.name}>
+      <span data-part aria-hidden="true">{first}</span>
+      <span data-part aria-hidden="true">{rest.join(' ')}</span>
+    </h1>
+    <p class="hero__frase">{d.hero.statement}</p>
+    <div class="hero__acoes">
+      <a class="acao acao--principal" href={projectPath(lang, 'tcc')}>{d.hero.ctaTcc}</a>
+      <a class="acao" href="#projetos">{d.hero.ctaProjects}</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { startHero } from '../../lib/rain/hero';
+
+  // Scripts de módulo rodam uma vez só. A chuva começa a cada chegada na página
+  // e para antes de a página ser trocada, para nunca haver dois laços de animação.
+  let stop: (() => void) | null = null;
+  // A abertura toca uma vez por carregamento; nas voltas à página inicial o grafo já vem formado.
+  let played = false;
+
+  document.addEventListener('astro:page-load', () => {
+    stop?.();
+    const el = document.querySelector<HTMLElement>('[data-hero]');
+    if (!el) {
+      stop = null;
+      return;
+    }
+    stop = startHero(el, { intro: !played });
+    played = true;
+  });
+
+  document.addEventListener('astro:before-swap', () => {
+    stop?.();
+    stop = null;
+  });
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    align-items: end;
+    min-height: calc(100svh - 3.6rem);
+    overflow: hidden;
+  }
+
+  .hero__chuva,
+  .hero__grafo,
+  .hero__veu {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero__chuva {
+    z-index: -3;
+  }
+
+  .hero__veu {
+    z-index: -2;
+    background: linear-gradient(
+      to top right,
+      color-mix(in srgb, var(--tinta) 94%, transparent) 0%,
+      color-mix(in srgb, var(--tinta) 62%, transparent) 36%,
+      transparent 66%
+    );
+    pointer-events: none;
+  }
+
+  .hero__grafo {
+    z-index: -1;
+    overflow: visible;
+  }
+
+  .hero__grafo line {
+    stroke: color-mix(in srgb, var(--verde) 45%, transparent);
+    stroke-width: 1.25;
+  }
+
+  .no circle {
+    fill: var(--verde);
+  }
+
+  .no--pivo circle {
+    stroke: color-mix(in srgb, var(--verde) 35%, transparent);
+    stroke-width: 8;
+    paint-order: stroke;
+  }
+
+  .no--distrator circle {
+    fill: var(--tinta);
+    stroke: var(--texto-2);
+    stroke-width: 1.5;
+  }
+
+  .no text {
+    font-family: var(--font-mono);
+    font-stretch: 87.5%;
+    font-size: 11px;
+    fill: var(--texto-2);
+  }
+
+  .hero__texto {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+    padding-block: var(--space-7);
+  }
+
+  .hero__nome {
+    font-size: var(--step-nome);
+    line-height: 0.86;
+    letter-spacing: -0.03em;
+  }
+
+  .hero__nome span {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .hero__frase {
+    max-width: 46ch;
+    font-size: var(--step-1);
+    line-height: 1.45;
+  }
+
+  .hero__acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  @media (max-width: 720px) {
+    .hero__veu {
+      background: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--tinta) 96%, transparent) 0%,
+        color-mix(in srgb, var(--tinta) 80%, transparent) 46%,
+        transparent 72%
+      );
+    }
+
+    .hero__texto {
+      padding-block: var(--space-6);
+    }
+
+    .hero__frase {
+      font-size: var(--step-0);
+    }
+
+    .no text {
+      font-size: 10px;
+    }
+  }
+
+  @media (max-width: 460px) {
+    .no text {
+      display: none;
+    }
+  }
+</style>

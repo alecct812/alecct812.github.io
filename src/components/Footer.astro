@@ -1,0 +1,33 @@
+---
+import { t, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const d = t(lang);
+---
+
+<footer class="rodape">
+  <div class="wrap rodape__linha">
+    <p>{d.site.name}, {new Date().getFullYear()}. {d.footer.note}</p>
+    <a href="https://github.com/alecct812/alecct812.github.io">{d.footer.source}</a>
+  </div>
+</footer>
+
+<style>
+  .rodape {
+    border-top: 1px solid var(--linha);
+    padding-block: var(--space-6);
+    color: var(--texto-2);
+    font-size: var(--step--1);
+  }
+
+  .rodape__linha {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-3) var(--space-6);
+  }
+</style>

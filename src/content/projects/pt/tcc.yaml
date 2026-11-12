@@ -1,0 +1,34 @@
+slug: tcc
+lang: pt
+order: 1
+featured: true
+name: Agente de teste de invasão com estado explícito
+tagline: 'TCC: o mesmo agente, duas formas de lembrar da rede, vinte execuções num laboratório isolado.'
+role: Autor do Trabalho de Conclusão de Curso
+period: '2026'
+areas: [security, ai, backend]
+stack:
+  - Python 3.13
+  - Docker Compose
+  - API da Anthropic
+  - nmap
+  - SSH
+  - hydra
+  - sqlmap
+  - curl
+  - netcat
+repo: https://github.com/alecct812/tcc
+situation: >-
+  Agentes de teste de invasão com LLM perdem o contexto da sessão ao atravessar redes segmentadas, e as
+  soluções acadêmicas existentes estruturam a tarefa, não o ambiente.
+task: >-
+  Medir se manter o estado do ambiente num grafo explícito, fora da janela de contexto do modelo, muda a
+  capacidade do agente de descobrir e alcançar uma sub-rede interna.
+action: >-
+  Construí o agente (laço de decisão, grafo de estado, invólucros de ferramenta com parsers dedicados), o
+  laboratório de sete contêineres em duas sub-redes e a instrumentação que produz as medidas. Registrei as
+  métricas e o critério de sucesso antes da coleta.
+result: >-
+  Em dez pares, o braço com grafo alcançou a sub-rede interna em 8 de 10 execuções e o braço com memória
+  conversacional em 3 de 10 (Fisher exato unicaudal, p = 0,0349). O critério binário pré-registrado não foi
+  atendido, e o trabalho relata isso.

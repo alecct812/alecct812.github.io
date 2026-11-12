@@ -1,0 +1,33 @@
+---
+import { getEntry } from 'astro:content';
+import ProjectPage from './ProjectPage.astro';
+import Pipeline from '../hubfolio/Pipeline.astro';
+import TccStudy from '../tcc/TccStudy.astro';
+import { t, type Lang, type Slug } from '../../i18n';
+
+interface Props {
+  lang: Lang;
+  slug: Slug;
+}
+
+// Corpo comum às duas rotas de projeto: /projetos/<slug>/ e /en/projects/<slug>/.
+const { lang, slug } = Astro.props;
+const entry = await getEntry('projects', `${lang}/${slug}`);
+if (!entry) throw new Error(`Projeto sem conteúdo: ${lang}/${slug}`);
+const d = t(lang);
+---
+
+<ProjectPage entry={entry} lang={lang}>
+  {slug === 'tcc' && <TccStudy lang={lang} />}
+  {slug === 'hubfolio' && <Pipeline lang={lang} />}
+  <Fragment slot="repo">
+    {
+      slug === 'tcc' && (
+        <>
+          <p>{d.tcc.repo.body}</p>
+          <p class="apoio">{d.tcc.repo.notice}</p>
+        </>
+      )
+    }
+  </Fragment>
+</ProjectPage>

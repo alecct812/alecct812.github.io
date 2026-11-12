@@ -1,0 +1,71 @@
+---
+import { reached, type Arm } from '../../data/tcc';
+import { t, type Lang } from '../../i18n';
+
+interface Props {
+  arm: Arm;
+  lang: Lang;
+}
+
+const { arm, lang } = Astro.props;
+const d = t(lang).tccFeature;
+const n = reached(arm);
+---
+
+<div class:list={['braco', arm === 'A' ? 'braco--a' : 'braco--b']}>
+  <p class="braco__nome">{arm === 'A' ? d.armA : d.armB}</p>
+  <div class="braco__linha">
+    <div class="braco__pontos" aria-hidden="true">
+      {Array.from({ length: 10 }, (_, i) => <span class:list={['ponto', i < n && 'ponto--aceso']} />)}
+    </div>
+    <p class="braco__conta">{d.of(n)}</p>
+  </div>
+</div>
+
+<style>
+  .braco--a {
+    --cor: var(--verde);
+  }
+
+  .braco--b {
+    --cor: var(--ambar);
+  }
+
+  .braco__nome {
+    color: var(--texto-2);
+    font-size: var(--step--1);
+    margin-bottom: var(--space-2);
+  }
+
+  .braco__linha {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-5);
+  }
+
+  .braco__pontos {
+    display: flex;
+    gap: clamp(5px, 1vw, 9px);
+  }
+
+  .ponto {
+    width: clamp(14px, 2.2vw, 20px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--linha);
+  }
+
+  .ponto--aceso {
+    background: var(--cor);
+  }
+
+  .braco__conta {
+    font-weight: 800;
+    font-stretch: 75%;
+    font-size: var(--step-4);
+    line-height: 1;
+    color: var(--cor);
+    white-space: nowrap;
+  }
+</style>
