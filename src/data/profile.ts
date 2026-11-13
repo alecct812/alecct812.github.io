@@ -37,7 +37,7 @@ export const SKILLS: readonly SkillGroup[] = [
 ];
 
 export const EDUCATION = {
-  school: 'C.E.S.A.R School',
+  school: 'CESAR School',
   place: { pt: 'Recife, PE', en: 'Recife, Brazil' } satisfies Text,
   degree: { pt: 'Bacharelado em Ciência da Computação', en: 'BSc in Computer Science' } satisfies Text,
   period: { pt: '2023 até hoje, 8º período', en: '2023 to present, 8th semester' } satisfies Text,

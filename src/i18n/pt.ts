@@ -12,7 +12,7 @@ export const pt = {
     contact: 'Contato',
   },
   skip: 'Pular para o conteúdo',
-  langSwitch: { label: 'English', aria: 'Ver esta página em inglês' },
+  langSwitch: { label: 'English' },
   footer: {
     note: 'Feito com Astro e publicado no GitHub Pages.',
     source: 'Código deste site',
@@ -32,8 +32,6 @@ export const pt = {
     armA: 'Braço A, grafo explícito',
     armB: 'Braço B, memória conversacional',
     of: (n: number) => `${n} de 10`,
-    dotsAria: (arm: string, n: number) =>
-      `Braço ${arm}: ${n} de 10 execuções alcançaram a sub-rede interna`,
     fisher: 'Fisher exato unicaudal',
     caveat:
       'O critério que fixei antes da coleta não foi atendido, e o estudo diz isso com todas as letras.',
@@ -53,7 +51,6 @@ export const pt = {
 
   projects: {
     heading: 'Projetos',
-    open: (name: string) => `Abrir o projeto ${name}`,
   },
 
   skills: { heading: 'Habilidades' },
@@ -211,7 +208,7 @@ export const pt = {
     },
     limitation: {
       heading: 'O que o resultado não autoriza',
-      p1: 'O critério congelado antes da coleta era A ≥ 6/10 e B ≤ 2/10. A metade de A passou, com 8 de 10. A metade de B falhou, com 3 de 10, um a mais que o limite. Pelo critério que eu mesmo fixei, a hipótese não foi confirmada.',
+      p1: 'O critério congelado antes da coleta era A ≥ 6/10 e B ≤ 2/10. A condição de A foi atendida, com 8 de 10. A de B não foi, com 3 de 10, um a mais que o limite. Pelo critério que eu mesmo fixei, a hipótese não foi confirmada.',
       p2: 'O teste exato de Fisher dá p = 0,0349, significativo a 5%. Os dois números são relatados separadamente porque medem coisas diferentes: um limiar de proporção não é um teste de significância.',
       p3: 'Em dois pares os dois braços alcançaram a sub-rede interna, e em um par só o braço B alcançou. Nenhuma das vinte execuções chegou ao troféu dentro de 80 passos.',
     },
@@ -228,7 +225,6 @@ export const pt = {
       },
     },
     repo: {
-      heading: 'Código e dados',
       body: 'O repositório traz o agente, o laboratório, os vinte registros de execução passo a passo e os verificadores. A tabela de resultados é gerada por programa a partir dos registros.',
       notice:
         'O laboratório é isolado, local e em contêiner. Nada ali deve ser executado contra um sistema que você não esteja autorizado a testar.',

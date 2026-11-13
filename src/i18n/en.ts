@@ -14,7 +14,7 @@ export const en: Dict = {
     contact: 'Contact',
   },
   skip: 'Skip to content',
-  langSwitch: { label: 'Português', aria: 'View this page in Portuguese' },
+  langSwitch: { label: 'Português' },
   footer: {
     note: 'Built with Astro and published on GitHub Pages.',
     source: 'Source code for this site',
@@ -34,7 +34,6 @@ export const en: Dict = {
     armA: 'Arm A, explicit graph',
     armB: 'Arm B, conversational memory',
     of: (n: number) => `${n} of 10`,
-    dotsAria: (arm: string, n: number) => `Arm ${arm}: ${n} of 10 runs reached the internal subnet`,
     fisher: "One-tailed Fisher's exact test",
     caveat: 'The criterion I fixed before data collection was not met, and the study says so plainly.',
     cta: 'Read the study',
@@ -53,7 +52,6 @@ export const en: Dict = {
 
   projects: {
     heading: 'Projects',
-    open: (name: string) => `Open the ${name} project`,
   },
 
   skills: { heading: 'Skills' },
@@ -142,8 +140,8 @@ export const en: Dict = {
       next: 'Next step',
       stepOf: (n: number) => `Step ${n} of 11`,
       goTo: (n: number) => `Go to step ${n}`,
-      elos: 'Links reached',
-      elo: (n: number) => `Link ${n}`,
+      elos: 'Milestones reached',
+      elo: (n: number) => `Milestone ${n}`,
       keyboard: 'With focus on the controls, the arrow keys also move through the steps.',
       distractor:
         'host-glhf is a distractor: a vulnerable third-party application, outside the chain, that gives the agent a deep place to get lost in.',
@@ -162,11 +160,11 @@ export const en: Dict = {
         },
         entry: {
           name: 'Command injection on the entry host',
-          note: 'First command executed inside the lab and first credential read. Links 1 and 2.',
+          note: 'First command executed inside the lab and first credential read. Milestones 1 and 2.',
         },
         pivotLogin: {
           name: 'SSH access to srv-deploy',
-          note: 'The credential found in the previous step opens srv-deploy. Link 3.',
+          note: 'The credential found in the previous step opens srv-deploy. Milestone 3.',
         },
         secondInterface: {
           name: 'Discovering the second interface',
@@ -178,7 +176,7 @@ export const en: Dict = {
         },
         credentialReuse: {
           name: 'Credential reuse on host-db',
-          note: 'A command executed on the internal subnet. This is link 4, the primary success of the hypothesis.',
+          note: 'A command executed on the internal subnet. This is milestone 4, the primary success of the hypothesis.',
         },
         deployKey: {
           name: 'Locating the deploy key',
@@ -190,27 +188,27 @@ export const en: Dict = {
         },
         trophy: {
           name: 'Using the same key on srv-financeiro',
-          note: 'Reading the trophy and the end of the chain. Link 5, descriptive: it is not part of the criterion.',
+          note: 'Reading the trophy and the end of the chain. Milestone 5, descriptive: it is not part of the criterion.',
         },
       },
     },
     results: {
       heading: 'The result in ten pairs',
       intro:
-        'Twenty runs, all to the 80-step ceiling. Each column is a pair: the lab is rebuilt between arms, and A and B sit side by side. Height is the highest link reached.',
+        'Twenty runs, all to the 80-step ceiling. Each column is a pair: the lab is rebuilt between arms, and A and B sit side by side. Height is the highest milestone reached.',
       pair: (n: number) => `Pair ${n}`,
-      pairAria: (n: number, a: number, b: number) => `Pair ${n}: arm A at link ${a}, arm B at link ${b}`,
+      pairAria: (n: number, a: number, b: number) => `Pair ${n}: arm A at milestone ${a}, arm B at milestone ${b}`,
       detail: (arm: string, elo: number, step: number | null) =>
         step === null
-          ? `Arm ${arm}: link ${elo}. Did not reach the internal subnet.`
-          : `Arm ${arm}: link ${elo}. Reached the internal subnet at step ${step}.`,
+          ? `Arm ${arm}: milestone ${elo}. Did not reach the internal subnet.`
+          : `Arm ${arm}: milestone ${elo}. Reached the internal subnet at step ${step}.`,
       pick: 'Select a pair to see the detail.',
       metric: 'Runs that reached the internal subnet, the preregistered primary metric',
-      eloAxis: 'link',
+      eloAxis: 'milestone',
     },
     limitation: {
       heading: 'What the result does not support',
-      p1: 'The criterion frozen before data collection was A ≥ 6/10 and B ≤ 2/10. The A half passed, with 8 of 10. The B half failed, with 3 of 10, one above the limit. By the criterion I set myself, the hypothesis was not confirmed.',
+      p1: 'The criterion frozen before data collection was A ≥ 6/10 and B ≤ 2/10. The A condition was met, with 8 of 10. The B condition was not, with 3 of 10, one above the limit. By the criterion I set myself, the hypothesis was not confirmed.',
       p2: 'Fisher’s exact test gives p = 0.0349, significant at 5%. The two numbers are reported separately because they measure different things: a proportion threshold is not a significance test.',
       p3: 'In two pairs both arms reached the internal subnet, and in one pair only arm B did. None of the twenty runs reached the trophy within 80 steps.',
     },
@@ -227,7 +225,6 @@ export const en: Dict = {
       },
     },
     repo: {
-      heading: 'Code and data',
       body: 'The repository holds the agent, the lab, the twenty step-by-step run records, and the verifiers. The results table is generated by a program from those records.',
       notice:
         'The lab is isolated, local, and containerized. Nothing in it should be run against a system you are not authorized to test.',

@@ -75,6 +75,17 @@ mustContain(page('en'), ['Alec', 'Theotônio', '8 of 10', '3 of 10']);
 mustContain(page('projetos', 'tcc'), ['8 de 10', '3 de 10', 'Passo 1 de 11']);
 mustContain(page('en', 'projects', 'tcc'), ['8 of 10', '3 of 10', 'Step 1 of 11']);
 
+// O nome precisa estar no próprio h1 da abertura, não só no cabeçalho ou no título da aba.
+const textOf = (html) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+for (const file of [page(), page('en')]) {
+  if (!existsSync(file)) continue;
+  const h1 = read(file).match(/<h1[^>]*>([\s\S]*?)<\/h1>/);
+  const text = h1 ? textOf(h1[1]) : '';
+  if (!text.includes('Alec') || !text.includes('Theotônio')) {
+    fail(`${relative(root, file)}: o h1 não traz o nome (encontrado: "${text}")`);
+  }
+}
+
 // 3b. As páginas em inglês não trazem texto em português.
 for (const file of pages.en) {
   if (!existsSync(file)) continue;
@@ -122,16 +133,61 @@ for (const [lang, list] of Object.entries(pages)) {
   }
 }
 
-// 6. Nenhum recurso carregado de terceiros.
+// 6. Nenhum recurso carregado de terceiros: nem por src, nem por <link> (folha de estilo,
+//    preload, fonte), nem por @import ou url() no CSS, nem por fetch ou import() no JavaScript.
+const OWN = 'alecct812.github.io';
+const external = (url) => {
+  try {
+    return new URL(url).host !== OWN;
+  } catch {
+    return false;
+  }
+};
 for (const file of files) {
   const text = read(file);
+  const name = relative(root, file);
   if (file.endsWith('.html')) {
-    if (/\s(?:src|srcset)=["']https?:\/\//.test(text)) fail(`${relative(root, file)} carrega recurso externo (src)`);
-    if (/<link[^>]+rel=["']stylesheet["'][^>]+href=["']https?:\/\//.test(text))
-      fail(`${relative(root, file)} carrega folha de estilo externa`);
+    for (const m of text.matchAll(/\s(?:src|srcset)=["'](https?:\/\/[^"'\s]+)/g)) {
+      if (external(m[1])) fail(`${name} carrega recurso externo: ${m[1]}`);
+    }
+    for (const m of text.matchAll(/<link\b[^>]*\shref=["'](https?:\/\/[^"']+)["'][^>]*>/g)) {
+      if (external(m[1])) fail(`${name} tem <link> para fora do site: ${m[1]}`);
+    }
   }
-  if (file.endsWith('.css') && /url\(["']?https?:\/\//.test(text)) {
-    fail(`${relative(root, file)} referencia recurso externo`);
+  if (/\.(css|html)$/.test(file)) {
+    const imported = text.match(/@import\s+(?:url\()?["']?https?:\/\/[^"')\s;]+/);
+    if (imported) fail(`${name} importa CSS de fora: ${imported[0]}`);
+    for (const m of text.matchAll(/url\(\s*["']?(https?:\/\/[^"')\s]+)/g)) {
+      if (external(m[1])) fail(`${name} referencia recurso externo: ${m[1]}`);
+    }
+  }
+  if (/\.(m?js|html)$/.test(file)) {
+    for (const m of text.matchAll(/\b(?:fetch|import)\(\s*["'`](https?:\/\/[^"'`]+)/g)) {
+      if (external(m[1])) fail(`${name} busca recurso de fora: ${m[1]}`);
+    }
+  }
+}
+
+// 6a. Um link com aria-label precisa conter, no rótulo, o texto que mostra (WCAG 2.5.3):
+//     quem usa leitor de tela ou comando de voz ouve e fala o mesmo que os outros veem.
+for (const file of files.filter((f) => f.endsWith('.html'))) {
+  for (const m of read(file).matchAll(/<a\b([^>]*)\saria-label="([^"]*)"([^>]*)>([\s\S]*?)<\/a>/g)) {
+    const visible = textOf(m[4]);
+    const label = m[2].replace(/\s+/g, ' ').trim();
+    if (visible && !label.toLowerCase().includes(visible.toLowerCase())) {
+      fail(`${relative(root, file)}: link com aria-label "${label}" esconde o texto visível "${visible.slice(0, 60)}"`);
+    }
+  }
+}
+
+// 6b. A página 404 não se declara como endereço próprio nem pede para ser indexada.
+{
+  const file = join(root, '404.html');
+  if (existsSync(file)) {
+    const html = read(file);
+    if (/<link[^>]+rel=["'](?:canonical|alternate)["']/.test(html)) fail('404.html declara canonical ou hreflang');
+    if (/<meta[^>]+property=["']og:url["']/.test(html)) fail('404.html declara og:url');
+    if (!/<meta[^>]+name=["']robots["'][^>]+noindex/.test(html)) fail('404.html sem robots noindex');
   }
 }
 
@@ -145,7 +201,9 @@ for (const file of files.filter((f) => f.endsWith('.html'))) {
 }
 
 // 8. A página do TCC mostra nomes de ação, nunca comandos ou credenciais.
-const FORBIDDEN = /\b(?:nmap|hydra|sqlmap|curl|ssh|nc)\s+-{1,2}\w|password|passwd|senha|BEGIN [A-Z ]*PRIVATE KEY/i;
+// Credencial é uma atribuição ("senha: ...", "password=..."), não a palavra solta numa frase.
+const FORBIDDEN =
+  /\b(?:nmap|hydra|sqlmap|curl|ssh|nc)\s+-{1,2}\w|\b(?:password|passwd|senha)\s*[=:]\s*\S|BEGIN [A-Z ]*PRIVATE KEY/i;
 for (const file of [page('projetos', 'tcc'), page('en', 'projects', 'tcc')]) {
   if (!existsSync(file)) continue;
   const hit = read(file).match(FORBIDDEN);

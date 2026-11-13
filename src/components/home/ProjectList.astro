@@ -21,7 +21,7 @@ const projects = (await getCollection('projects'))
       {
         projects.map(({ data: p }) => (
           <li class:list={['proj', p.featured && 'proj--destaque']} data-project-areas={p.areas.join(' ')}>
-            <a class="proj__link" href={projectPath(lang, p.slug)} aria-label={d.projects.open(p.name)}>
+            <a class="proj__link" href={projectPath(lang, p.slug)}>
               <div class="proj__titulo">
                 <h3 class="proj__nome" transition:name={`projeto-${p.slug}`}>
                   {p.name}

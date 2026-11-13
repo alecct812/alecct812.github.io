@@ -15,6 +15,8 @@ const d = t(lang).hubfolio;
     <p class="intro">{d.intro}</p>
 
     <!-- A ordem é a do dado: é uma sequência de verdade, por isso a lista é numerada. -->
+    <div class="fluxo-caixa" data-fluxo>
+    <span class="trilho" aria-hidden="true"><span class="trilho__dado"></span></span>
     <ol class="fluxo" aria-label={d.aria}>
       {
         d.stages.map((s, i) => (
@@ -29,6 +31,7 @@ const d = t(lang).hubfolio;
         ))
       }
     </ol>
+    </div>
 
     <dl class="medidas">
       {
@@ -52,45 +55,55 @@ const d = t(lang).hubfolio;
     max-width: 62ch;
   }
 
+  .fluxo-caixa {
+    position: relative;
+    margin-top: var(--space-7);
+  }
+
   .fluxo {
     --n: 6;
-    position: relative;
     display: grid;
     grid-template-columns: repeat(var(--n), minmax(0, 1fr));
     gap: var(--space-4);
-    margin-top: var(--space-7);
     padding-top: var(--space-6);
   }
 
-  /* O trilho por onde o dado passa, e o dado passando. */
-  .fluxo::before,
-  .fluxo::after {
-    content: '';
+  /* O trilho por onde o dado passa. Ele é um contêiner de tamanho, para o dado poder
+     se mover com transform (barato, sem recalcular o layout) usando o comprimento do trilho. */
+  .trilho {
     position: absolute;
     top: 0.9rem;
     left: 0;
-  }
-
-  .fluxo::before {
     right: 0;
     height: 2px;
     background: var(--linha);
+    container-type: size;
+    overflow: hidden;
   }
 
-  .fluxo::after {
+  .trilho__dado {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 3.5rem;
-    height: 2px;
+    height: 100%;
     background: linear-gradient(to right, transparent, var(--texto));
     animation: dado 5.5s linear infinite;
+    will-change: transform;
+  }
+
+  /* Fora da tela o dado para. */
+  .fluxo-caixa[data-pausado] .trilho__dado {
+    animation-play-state: paused;
   }
 
   @keyframes dado {
     from {
-      left: 0;
+      transform: translateX(0);
     }
 
     to {
-      left: calc(100% - 3.5rem);
+      transform: translateX(calc(100cqw - 3.5rem));
     }
   }
 
@@ -165,7 +178,7 @@ const d = t(lang).hubfolio;
       padding-left: 3rem;
     }
 
-    .fluxo::before {
+    .trilho {
       top: 0;
       bottom: 0;
       left: 0.8rem;
@@ -174,9 +187,8 @@ const d = t(lang).hubfolio;
       height: auto;
     }
 
-    .fluxo::after {
-      left: 0.8rem;
-      width: 2px;
+    .trilho__dado {
+      width: 100%;
       height: 3.5rem;
       background: linear-gradient(to bottom, transparent, var(--texto));
       animation-name: dado-em-pe;
@@ -184,11 +196,11 @@ const d = t(lang).hubfolio;
 
     @keyframes dado-em-pe {
       from {
-        top: 0;
+        transform: translateY(0);
       }
 
       to {
-        top: calc(100% - 3.5rem);
+        transform: translateY(calc(100cqh - 3.5rem));
       }
     }
 
@@ -206,8 +218,30 @@ const d = t(lang).hubfolio;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .fluxo::after {
+    .trilho__dado {
       display: none;
     }
   }
 </style>
+
+<script>
+  // Pausa o dado quando o diagrama sai da tela. Sem JavaScript ele só continua andando.
+  let io: IntersectionObserver | null = null;
+
+  document.addEventListener('astro:page-load', () => {
+    io?.disconnect();
+    io = null;
+    const el = document.querySelector<HTMLElement>('[data-fluxo]');
+    if (!el) return;
+    io = new IntersectionObserver((entries) => {
+      const visible = entries[entries.length - 1]?.isIntersecting ?? true;
+      el.toggleAttribute('data-pausado', !visible);
+    });
+    io.observe(el);
+  });
+
+  document.addEventListener('astro:before-swap', () => {
+    io?.disconnect();
+    io = null;
+  });
+</script>

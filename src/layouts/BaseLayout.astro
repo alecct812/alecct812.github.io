@@ -13,9 +13,11 @@ interface Props {
   lang: Lang;
   title: string;
   description: string;
+  /** Página sem endereço próprio (a 404): sem canonical, sem hreflang, fora dos buscadores. */
+  notFound?: boolean;
 }
 
-const { lang, title, description } = Astro.props;
+const { lang, title, description, notFound = false } = Astro.props;
 const site = Astro.site!;
 const here = new URL(Astro.url.pathname, site).href;
 const alt = new URL(switchLangPath(Astro.url.pathname), site).href;
@@ -29,13 +31,21 @@ const altLang = lang === 'pt' ? 'en' : 'pt';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={here} />
-    <link rel="alternate" hreflang={lang} href={here} />
-    <link rel="alternate" hreflang={altLang} href={alt} />
+    {
+      notFound ? (
+        <meta name="robots" content="noindex" />
+      ) : (
+        <>
+          <link rel="canonical" href={here} />
+          <link rel="alternate" hreflang={lang} href={here} />
+          <link rel="alternate" hreflang={altLang} href={alt} />
+          <meta property="og:url" content={here} />
+        </>
+      )
+    }
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={here} />
     <meta property="og:locale" content={lang === 'pt' ? 'pt_BR' : 'en_US'} />
     <meta name="theme-color" content="#06101a" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

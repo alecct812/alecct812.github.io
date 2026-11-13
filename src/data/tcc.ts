@@ -94,6 +94,21 @@ export const STEPS: readonly ChainStep[] = [
 /** Execuções do braço que alcançaram a sub-rede interna (elo 4 ou mais). */
 export const reached = (arm: Arm): number => PAIRS.filter((p) => p[arm].elo >= 4).length;
 
+/** Critério binário congelado antes da coleta: A ≥ minA/10 e B ≤ maxB/10. */
+export const CRITERION = { minA: 6, maxB: 2 } as const;
+
+/** Os pares separados por quem alcançou a sub-rede interna, e quantas execuções chegaram ao troféu. */
+export function pairStats(): { both: number; onlyA: number; onlyB: number; neither: number; trophy: number } {
+  const r = (run: Run) => run.elo >= 4;
+  return {
+    both: PAIRS.filter((p) => r(p.A) && r(p.B)).length,
+    onlyA: PAIRS.filter((p) => r(p.A) && !r(p.B)).length,
+    onlyB: PAIRS.filter((p) => !r(p.A) && r(p.B)).length,
+    neither: PAIRS.filter((p) => !r(p.A) && !r(p.B)).length,
+    trophy: PAIRS.reduce((n, p) => n + (p.A.elo >= 5 ? 1 : 0) + (p.B.elo >= 5 ? 1 : 0), 0),
+  };
+}
+
 /** Fisher exato unicaudal sobre 8/10 contra 3/10. */
 export const FISHER_P = 0.0349;
 

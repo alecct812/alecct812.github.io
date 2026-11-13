@@ -11,7 +11,7 @@ const d = t(lang);
 const target = lang === 'pt' ? 'en' : 'pt-BR';
 ---
 
-<a class="troca" href={switchLangPath(Astro.url.pathname)} hreflang={target} lang={target} aria-label={d.langSwitch.aria}>
+<a class="troca" href={switchLangPath(Astro.url.pathname)} hreflang={target} lang={target}>
   {d.langSwitch.label}
 </a>
 
